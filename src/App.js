@@ -1,5 +1,6 @@
 import "./App.css";
 import { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
@@ -18,12 +19,41 @@ function App() {
 
       // if data.wordle exists, then data exists
       if (data.wordle) {
-        setScoresData(data);
+        convertToChartData(data.scores);
       }
     };
 
     fetchData();
   }, [selectedWordle]);
+
+  const convertToChartData = (scores) => {
+    setScoresData([
+      {
+        name: "1",
+        Count: scores["1"],
+      },
+      {
+        name: "2",
+        Count: scores["2"],
+      },
+      {
+        name: "3",
+        Count: scores["3"],
+      },
+      {
+        name: "4",
+        Count: scores["4"],
+      },
+      {
+        name: "5",
+        Count: scores["5"],
+      },
+      {
+        name: "6",
+        Count: scores["6"],
+      },
+    ]);
+  };
 
   return (
     <div className="App" style={{ display: "flex", flexDirection: "column" }}>
@@ -34,10 +64,22 @@ function App() {
           flexDirection: "column",
           flexGrow: 1,
           justifyContent: "center",
+          height: "80vh",
+          width: "100%",
         }}
       >
         <span className="title">WORDLE {selectedWordle} SCORES</span>
-        <div>{JSON.stringify(scoresData)}</div>
+        <ResponsiveContainer height="50%">
+          <BarChart width={"100%"} height={300} data={scoresData}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Bar
+              dataKey="Count"
+              fill="#82ca9d"
+              label={{ position: "insideTop" }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
