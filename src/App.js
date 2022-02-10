@@ -1,6 +1,13 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
@@ -73,11 +80,8 @@ function App() {
           <BarChart width={"100%"} height={300} data={scoresData}>
             <XAxis dataKey="name" />
             <YAxis />
-            <Bar
-              dataKey="Count"
-              fill="#82ca9d"
-              label={{ position: "insideTop" }}
-            />
+            <Tooltip cursor={{ fill: "#121213" }} />
+            <Bar dataKey="Count" fill="#538d4e" />
           </BarChart>
         </ResponsiveContainer>
       </div>
