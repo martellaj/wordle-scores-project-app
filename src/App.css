@@ -111,3 +111,10 @@ body {
   width: 50px;
   color: white;
 }
+
+.statsStats {
+  margin-bottom: 24px;
+  font-size: 12px;
+  height: fit-content;
+  letter-spacing: 0.1em;
+}

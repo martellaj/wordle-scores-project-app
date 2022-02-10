@@ -46,19 +46,27 @@ function App() {
     localStorage.setItem(`lastSubmittedScore`, getPuzzleNumber());
     localStorage.setItem("score", score);
 
+    setScoresData({
+      ...scoresData,
+      [score]: scoresData[score] + 1,
+    });
+
     setSubmittedScore(score);
     setIsAddScoreDialogOpen(false);
   };
 
+  let totalCount = 0;
+  if (scoresData) {
+    Object.values(scoresData).forEach((score) => {
+      totalCount += score;
+    });
+  }
+
   return (
     <div className="App" style={{ display: "flex", flexDirection: "column" }}>
       <header className="App-header">WORDLE SCORES PROJECT</header>
-      <div style={{ height: "50px", paddingTop: "12px" }}>
-        {submittedScore > 0 ? (
-          <span className="title" style={{ fontSize: "12px" }}>
-            Thank you for submitting your score today!
-          </span>
-        ) : (
+      {submittedScore > 0 ? null : (
+        <div style={{ height: "50px", paddingTop: "12px" }}>
           <Button
             variant="contained"
             color="success"
@@ -66,8 +74,8 @@ function App() {
           >
             SUBMIT YOUR SCORE
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       <div
         style={{
           display: "flex",
@@ -80,7 +88,16 @@ function App() {
           alignItems: "center",
         }}
       >
-        <span className="title">WORDLE {selectedWordle} SCORES</span>
+        <span className="title" style={{ marginBottom: "0" }}>
+          WORDLE {selectedWordle} SCORES
+        </span>
+        {scoresData && (
+          <div className="title statsStats">
+            <span>
+              Total submissions: <bold>{totalCount.toLocaleString()}</bold>
+            </span>
+          </div>
+        )}
         <GuessDistribution
           scores={scoresData}
           userTodayScore={submittedScore}
