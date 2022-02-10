@@ -8,10 +8,15 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import Button from "@mui/material/Button";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import { Chip, DialogContent } from "@mui/material";
 
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState(null);
+  const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,9 +67,28 @@ function App() {
     ]);
   };
 
+  const addScore = (score) => {
+    fetch(
+      // `http://localhost:3000/addScore/${selectedWordle}/${score}`,
+      `https://wordle-scores-project-service.herokuapp.com/addScore/${selectedWordle}/${score}`,
+      {
+        method: "POST",
+      }
+    );
+  };
+
   return (
     <div className="App" style={{ display: "flex", flexDirection: "column" }}>
       <header className="App-header">WORDLE SCORES PROJECT</header>
+      <div style={{ height: "50px", paddingTop: "12px" }}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => setIsAddScoreDialogOpen(true)}
+        >
+          SUBMIT YOUR SCORE
+        </Button>
+      </div>
       <div
         style={{
           display: "flex",
@@ -85,6 +109,32 @@ function App() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      <Dialog
+        open={isAddScoreDialogOpen}
+        onClose={() => setIsAddScoreDialogOpen(false)}
+      >
+        <DialogTitle>
+          How many guesses did you take to solve today's puzzle?
+        </DialogTitle>
+        <DialogContent>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Chip label="1" onClick={() => addScore(1)} />
+            <Chip label="2" onClick={() => addScore(2)} />
+            <Chip label="3" onClick={() => addScore(3)} />
+            <Chip label="4" onClick={() => addScore(4)} />
+            <Chip label="5" onClick={() => addScore(5)} />
+            <Chip label="6" onClick={() => addScore(6)} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

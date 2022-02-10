@@ -61,3 +61,9 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.MuiChip-root {
+  height: 50px !important;
+  width: 50px !important;
+  margin-bottom: 12px !important;
+}
