@@ -1,13 +1,5 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
 import Button from "@mui/material/Button";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
@@ -17,6 +9,9 @@ function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState(null);
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
+  const [submittedScore, setSubmittedScore] = useState(
+    didUserSubmitScoreToday()
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,41 +26,12 @@ function App() {
 
       // if data.wordle exists, then data exists
       if (data.wordle) {
-        convertToChartData(data.scores);
+        setScoresData(data.scores);
       }
     };
 
     fetchData();
   }, [selectedWordle]);
-
-  const convertToChartData = (scores) => {
-    setScoresData([
-      {
-        name: "1",
-        Count: scores["1"],
-      },
-      {
-        name: "2",
-        Count: scores["2"],
-      },
-      {
-        name: "3",
-        Count: scores["3"],
-      },
-      {
-        name: "4",
-        Count: scores["4"],
-      },
-      {
-        name: "5",
-        Count: scores["5"],
-      },
-      {
-        name: "6",
-        Count: scores["6"],
-      },
-    ]);
-  };
 
   const addScore = (score) => {
     fetch(
@@ -75,39 +41,44 @@ function App() {
         method: "POST",
       }
     );
+
+    localStorage.setItem(`lastSubmittedScore`, getPuzzleNumber());
+    setSubmittedScore(true);
+    setIsAddScoreDialogOpen(false);
   };
 
   return (
     <div className="App" style={{ display: "flex", flexDirection: "column" }}>
       <header className="App-header">WORDLE SCORES PROJECT</header>
       <div style={{ height: "50px", paddingTop: "12px" }}>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => setIsAddScoreDialogOpen(true)}
-        >
-          SUBMIT YOUR SCORE
-        </Button>
+        {submittedScore ? (
+          <span className="title" style={{ fontSize: "12px" }}>
+            Thank you for submitting your score today!
+          </span>
+        ) : (
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => setIsAddScoreDialogOpen(true)}
+          >
+            SUBMIT YOUR SCORE
+          </Button>
+        )}
       </div>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           flexGrow: 1,
-          justifyContent: "center",
+          justifyContent: "flex-start",
           height: "80vh",
           width: "100%",
+          paddingTop: "50px",
+          alignItems: "center",
         }}
       >
         <span className="title">WORDLE {selectedWordle} SCORES</span>
-        <ResponsiveContainer height="50%">
-          <BarChart width={"100%"} height={300} data={scoresData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip cursor={{ fill: "#121213" }} />
-            <Bar dataKey="Count" fill="#538d4e" />
-          </BarChart>
-        </ResponsiveContainer>
+        <GuessDistribution scores={scoresData} />
       </div>
 
       <Dialog
@@ -145,6 +116,57 @@ const getPuzzleNumber = (date) => {
   const val =
     new Date(_date).setHours(0, 0, 0, 0) - refDate.setHours(0, 0, 0, 0);
   return Math.round(val / 864e5);
+};
+
+const didUserSubmitScoreToday = () => {
+  const puzzleNumber = getPuzzleNumber();
+  const lastSubmittedScore = parseInt(
+    localStorage.getItem(`lastSubmittedScore`) || "0"
+  );
+
+  return puzzleNumber === lastSubmittedScore;
+};
+
+const GuessDistribution = (props) => {
+  const { scores } = props;
+
+  if (!scores) {
+    return null;
+  }
+
+  let totalCount = 0;
+  Object.values(scores).forEach((score) => {
+    totalCount += score;
+  });
+
+  return (
+    <div style={{ width: "80%" }}>
+      <Guess guess={1} count={scores["1"]} totalCount={totalCount} />
+      <Guess guess={2} count={scores["2"]} totalCount={totalCount} />
+      <Guess guess={3} count={scores["3"]} totalCount={totalCount} />
+      <Guess guess={4} count={scores["4"]} totalCount={totalCount} />
+      <Guess guess={5} count={scores["5"]} totalCount={totalCount} />
+      <Guess guess={6} count={scores["6"]} totalCount={totalCount} />
+    </div>
+  );
+};
+
+const Guess = (props) => {
+  const { guess, count, totalCount } = props;
+
+  return (
+    <div className="graph-container">
+      <div className="guess">{guess}</div>
+      <div className="graph">
+        <div
+          className="graph-bar align-right highlight"
+          style={{ width: `${(count / totalCount) * 100}%` }}
+        >
+          <div className="num-guesses">{count}</div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default App;
