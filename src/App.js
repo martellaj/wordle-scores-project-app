@@ -9,11 +9,12 @@ function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState(null);
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
-  const [submittedScore, setSubmittedScore] = useState(
-    didUserSubmitScoreToday()
-  );
+  const [submittedScore, setSubmittedScore] = useState(getTodayGuess());
 
   useEffect(() => {
+    const todayGuess = getTodayGuess();
+    setSubmittedScore(todayGuess);
+
     const fetchData = async () => {
       const response = await fetch(
         `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
@@ -43,7 +44,9 @@ function App() {
     );
 
     localStorage.setItem(`lastSubmittedScore`, getPuzzleNumber());
-    setSubmittedScore(true);
+    localStorage.setItem("score", score);
+
+    setSubmittedScore(score);
     setIsAddScoreDialogOpen(false);
   };
 
@@ -51,7 +54,7 @@ function App() {
     <div className="App" style={{ display: "flex", flexDirection: "column" }}>
       <header className="App-header">WORDLE SCORES PROJECT</header>
       <div style={{ height: "50px", paddingTop: "12px" }}>
-        {submittedScore ? (
+        {submittedScore > 0 ? (
           <span className="title" style={{ fontSize: "12px" }}>
             Thank you for submitting your score today!
           </span>
@@ -78,7 +81,10 @@ function App() {
         }}
       >
         <span className="title">WORDLE {selectedWordle} SCORES</span>
-        <GuessDistribution scores={scoresData} />
+        <GuessDistribution
+          scores={scoresData}
+          userTodayScore={submittedScore}
+        />
       </div>
 
       <Dialog
@@ -118,6 +124,18 @@ const getPuzzleNumber = (date) => {
   return Math.round(val / 864e5);
 };
 
+const getTodayGuess = () => {
+  const _didUserSubmitScoreToday = didUserSubmitScoreToday();
+
+  if (!_didUserSubmitScoreToday) {
+    return 0;
+  } else {
+    const _score = localStorage.getItem("score");
+    const score = parseInt(_score || "0");
+    return score;
+  }
+};
+
 const didUserSubmitScoreToday = () => {
   const puzzleNumber = getPuzzleNumber();
   const lastSubmittedScore = parseInt(
@@ -128,7 +146,7 @@ const didUserSubmitScoreToday = () => {
 };
 
 const GuessDistribution = (props) => {
-  const { scores } = props;
+  const { scores, userTodayScore } = props;
 
   if (!scores) {
     return null;
@@ -141,25 +159,57 @@ const GuessDistribution = (props) => {
 
   return (
     <div style={{ width: "80%" }}>
-      <Guess guess={1} count={scores["1"]} totalCount={totalCount} />
-      <Guess guess={2} count={scores["2"]} totalCount={totalCount} />
-      <Guess guess={3} count={scores["3"]} totalCount={totalCount} />
-      <Guess guess={4} count={scores["4"]} totalCount={totalCount} />
-      <Guess guess={5} count={scores["5"]} totalCount={totalCount} />
-      <Guess guess={6} count={scores["6"]} totalCount={totalCount} />
+      <Guess
+        guess={1}
+        count={scores["1"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
+      <Guess
+        guess={2}
+        count={scores["2"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
+      <Guess
+        guess={3}
+        count={scores["3"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
+      <Guess
+        guess={4}
+        count={scores["4"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
+      <Guess
+        guess={5}
+        count={scores["5"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
+      <Guess
+        guess={6}
+        count={scores["6"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
     </div>
   );
 };
 
 const Guess = (props) => {
-  const { guess, count, totalCount } = props;
+  const { guess, count, totalCount, userTodayScore } = props;
 
   return (
     <div className="graph-container">
       <div className="guess">{guess}</div>
       <div className="graph">
         <div
-          className="graph-bar align-right highlight"
+          className={`graph-bar align-right ${
+            userTodayScore === guess ? "highlight" : ""
+          }`}
           style={{ width: `${(count / totalCount) * 100}%` }}
         >
           <div className="num-guesses">{count}</div>
