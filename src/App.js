@@ -7,7 +7,14 @@ import { Chip, DialogContent } from "@mui/material";
 
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
-  const [scoresData, setScoresData] = useState(null);
+  const [scoresData, setScoresData] = useState({
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+  });
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [submittedScore, setSubmittedScore] = useState(getTodayGuess());
 
@@ -17,7 +24,8 @@ function App() {
 
     const fetchData = async () => {
       const response = await fetch(
-        `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
+        `http://localhost:3001/getStats/${selectedWordle}`,
+        // `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
         {
           method: "GET",
         }
@@ -36,8 +44,8 @@ function App() {
 
   const addScore = (score) => {
     fetch(
-      // `http://localhost:3000/addScore/${selectedWordle}/${score}`,
-      `https://wordle-scores-project-service.herokuapp.com/addScore/${selectedWordle}/${score}`,
+      `http://localhost:3001/addScore/${selectedWordle}/${score}`,
+      // `https://wordle-scores-project-service.herokuapp.com/addScore/${selectedWordle}/${score}`,
       {
         method: "POST",
       }
@@ -93,9 +101,7 @@ function App() {
         </span>
         {scoresData && (
           <div className="title statsStats">
-            <span>
-              Total submissions: <bold>{totalCount.toLocaleString()}</bold>
-            </span>
+            <span>Total submissions: {totalCount.toLocaleString()}</span>
           </div>
         )}
         <GuessDistribution
