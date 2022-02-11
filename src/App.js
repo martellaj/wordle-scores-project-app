@@ -13,6 +13,8 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
+const dataCache = {};
+
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState({
@@ -25,6 +27,7 @@ function App() {
   });
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [submittedScore, setSubmittedScore] = useState(getTodayGuess());
+  const [error, setError] = useState("");
 
   const darkTheme = createTheme({
     palette: {
@@ -32,10 +35,8 @@ function App() {
     },
   });
 
+  // update page if selected wordle changes
   useEffect(() => {
-    const todayGuess = getTodayGuess();
-    setSubmittedScore(todayGuess);
-
     const fetchData = async () => {
       const response = await fetch(
         `http://localhost:3001/getStats/${selectedWordle}`,
@@ -49,7 +50,11 @@ function App() {
 
       // if data.wordle exists, then data exists
       if (data.wordle) {
+        setError("");
         setScoresData(data.scores);
+      } else if (data.error) {
+        setScoresData(null);
+        setError(data.message || `oops, something's wrong`);
       }
     };
 
@@ -65,8 +70,7 @@ function App() {
       }
     );
 
-    localStorage.setItem(`lastSubmittedScore`, getPuzzleNumber());
-    localStorage.setItem("score", score);
+    localStorage.setItem(`score-${selectedWordle}`, score);
 
     setScoresData({
       ...scoresData,
@@ -88,7 +92,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <div className="App" style={{ display: "flex", flexDirection: "column" }}>
         <header className="App-header">WORDLE SCORES PROJECT</header>
-        {submittedScore > 0 ? null : (
+        {didUserSubmitScoreToday() ? null : (
           <div style={{ height: "50px", paddingTop: "12px" }}>
             <Button
               variant="contained"
@@ -114,18 +118,26 @@ function App() {
           <span className="title" style={{ marginBottom: "0" }}>
             WORDLE {selectedWordle} SCORES
           </span>
-          {scoresData && (
-            <div className="title statsStats">
-              <span>Total submissions: {totalCount.toLocaleString()}</span>
+          {!error && scoresData && (
+            <>
+              <div className="title statsStats">
+                <span>Total submissions: {totalCount.toLocaleString()}</span>
+              </div>
+
+              <GuessDistribution
+                scores={scoresData}
+                userTodayScore={submittedScore}
+              />
+            </>
+          )}
+          {error && (
+            <div>
+              <span className="title">{error}</span>
             </div>
           )}
-          <GuessDistribution
-            scores={scoresData}
-            userTodayScore={submittedScore}
-          />
           <div style={{ display: "flex", alignItems: "center" }}>
             <IconButton
-              disabled={selectedWordle <= 1}
+              disabled={selectedWordle <= 235}
               onClick={() => {
                 setSelectedWordle(selectedWordle - 1);
               }}
@@ -188,24 +200,12 @@ const getPuzzleNumber = (date) => {
 };
 
 const getTodayGuess = () => {
-  const _didUserSubmitScoreToday = didUserSubmitScoreToday();
-
-  if (!_didUserSubmitScoreToday) {
-    return 0;
-  } else {
-    const _score = localStorage.getItem("score");
-    const score = parseInt(_score || "0");
-    return score;
-  }
+  const score = localStorage.getItem(`score-${getPuzzleNumber()}`);
+  return score ? parseInt(score) : null;
 };
 
 const didUserSubmitScoreToday = () => {
-  const puzzleNumber = getPuzzleNumber();
-  const lastSubmittedScore = parseInt(
-    localStorage.getItem(`lastSubmittedScore`) || "0"
-  );
-
-  return puzzleNumber === lastSubmittedScore;
+  return !!localStorage.getItem(`score-${getPuzzleNumber()}`);
 };
 
 const GuessDistribution = (props) => {
@@ -271,6 +271,7 @@ const Guess = (props) => {
       <div className="graph">
         <div
           className={`graph-bar align-right ${
+            // need to fix this so that it highlights per day
             userTodayScore === guess ? "highlight" : ""
           }`}
           style={{ width: `${(count / totalCount) * 100}%` }}
