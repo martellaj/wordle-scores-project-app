@@ -3,7 +3,15 @@ import { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { Chip, DialogContent } from "@mui/material";
+import {
+  Chip,
+  DialogContent,
+  IconButton,
+  createTheme,
+  ThemeProvider,
+} from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
@@ -17,6 +25,12 @@ function App() {
   });
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [submittedScore, setSubmittedScore] = useState(getTodayGuess());
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
 
   useEffect(() => {
     const todayGuess = getTodayGuess();
@@ -71,71 +85,97 @@ function App() {
   }
 
   return (
-    <div className="App" style={{ display: "flex", flexDirection: "column" }}>
-      <header className="App-header">WORDLE SCORES PROJECT</header>
-      {submittedScore > 0 ? null : (
-        <div style={{ height: "50px", paddingTop: "12px" }}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => setIsAddScoreDialogOpen(true)}
-          >
-            SUBMIT YOUR SCORE
-          </Button>
-        </div>
-      )}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          justifyContent: "flex-start",
-          height: "80vh",
-          width: "100%",
-          paddingTop: "50px",
-          alignItems: "center",
-        }}
-      >
-        <span className="title" style={{ marginBottom: "0" }}>
-          WORDLE {selectedWordle} SCORES
-        </span>
-        {scoresData && (
-          <div className="title statsStats">
-            <span>Total submissions: {totalCount.toLocaleString()}</span>
+    <ThemeProvider theme={darkTheme}>
+      <div className="App" style={{ display: "flex", flexDirection: "column" }}>
+        <header className="App-header">WORDLE SCORES PROJECT</header>
+        {submittedScore > 0 ? null : (
+          <div style={{ height: "50px", paddingTop: "12px" }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setIsAddScoreDialogOpen(true)}
+            >
+              SUBMIT YOUR SCORE
+            </Button>
           </div>
         )}
-        <GuessDistribution
-          scores={scoresData}
-          userTodayScore={submittedScore}
-        />
-      </div>
-
-      <Dialog
-        open={isAddScoreDialogOpen}
-        onClose={() => setIsAddScoreDialogOpen(false)}
-      >
-        <DialogTitle>
-          How many guesses did you take to solve today's puzzle?
-        </DialogTitle>
-        <DialogContent>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Chip label="1" onClick={() => addScore(1)} />
-            <Chip label="2" onClick={() => addScore(2)} />
-            <Chip label="3" onClick={() => addScore(3)} />
-            <Chip label="4" onClick={() => addScore(4)} />
-            <Chip label="5" onClick={() => addScore(5)} />
-            <Chip label="6" onClick={() => addScore(6)} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            justifyContent: "flex-start",
+            height: "80vh",
+            width: "100%",
+            paddingTop: "50px",
+            alignItems: "center",
+          }}
+        >
+          <span className="title" style={{ marginBottom: "0" }}>
+            WORDLE {selectedWordle} SCORES
+          </span>
+          {scoresData && (
+            <div className="title statsStats">
+              <span>Total submissions: {totalCount.toLocaleString()}</span>
+            </div>
+          )}
+          <GuessDistribution
+            scores={scoresData}
+            userTodayScore={submittedScore}
+          />
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              disabled={selectedWordle <= 1}
+              onClick={() => {
+                setSelectedWordle(selectedWordle - 1);
+              }}
+            >
+              <ArrowBackIosNewIcon />
+            </IconButton>
+            <span
+              className="title"
+              style={{ margin: "0px 12px", marginBottom: "4px" }}
+            >
+              {selectedWordle}
+            </span>
+            <IconButton
+              disabled={selectedWordle === getPuzzleNumber()}
+              onClick={() => {
+                setSelectedWordle(selectedWordle + 1);
+              }}
+            >
+              <ArrowForwardIosIcon />
+            </IconButton>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        <Dialog
+          open={isAddScoreDialogOpen}
+          onClose={() => setIsAddScoreDialogOpen(false)}
+        >
+          <DialogTitle>
+            How many guesses did you take to solve today's puzzle?
+          </DialogTitle>
+          <DialogContent>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Chip label="1" onClick={() => addScore(1)} />
+              <Chip label="2" onClick={() => addScore(2)} />
+              <Chip label="3" onClick={() => addScore(3)} />
+              <Chip label="4" onClick={() => addScore(4)} />
+              <Chip label="5" onClick={() => addScore(5)} />
+              <Chip label="6" onClick={() => addScore(6)} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </ThemeProvider>
   );
 }
 
