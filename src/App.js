@@ -200,14 +200,14 @@ function App() {
           </div>
 
           <a
-            href="https://www.twitter.com/martellaj"
+            href="https://twitter.com/wordlescoresapp"
             style={{
               marginTop: "auto",
               marginBottom: "60px",
               color: "white",
             }}
           >
-            @martellaj
+            @wordlescoresapp
           </a>
         </div>
 
