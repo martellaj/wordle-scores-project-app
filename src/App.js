@@ -226,11 +226,6 @@ const getPuzzleNumber = (date) => {
   return Math.round(val / 864e5);
 };
 
-const getTodayGuess = () => {
-  const score = localStorage.getItem(`score-${getPuzzleNumber()}`);
-  return score ? parseInt(score) : null;
-};
-
 const didUserSubmitScoreToday = () => {
   return !!localStorage.getItem(`score-${getPuzzleNumber()}`);
 };
