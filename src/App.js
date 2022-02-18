@@ -15,6 +15,15 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const dataCache = {};
 
+// function randomIntFromInterval(min, max) {
+//   // min and max included
+//   return Math.floor(Math.random() * (max - min + 1) + min);
+// }
+
+// for (let i = 200; i < 300; i++) {
+//   localStorage.setItem("score-" + i, randomIntFromInterval(1, 6));
+// }
+
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState({
@@ -139,8 +148,8 @@ function App() {
               </div>
 
               <GuessDistribution
+                selectedWordle={selectedWordle}
                 scores={scoresData}
-                userTodayScore={submittedScore}
               />
             </>
           )}
@@ -226,11 +235,15 @@ const didUserSubmitScoreToday = () => {
 };
 
 const GuessDistribution = (props) => {
-  const { scores, userTodayScore } = props;
+  const { scores, selectedWordle } = props;
 
   if (!scores) {
     return null;
   }
+
+  const userTodayScore = parseInt(
+    localStorage.getItem(`score-${selectedWordle}`) || "-1"
+  );
 
   let totalCount = 0;
   Object.values(scores).forEach((score) => {
