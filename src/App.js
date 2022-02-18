@@ -37,10 +37,19 @@ function App() {
 
   // update page if selected wordle changes
   useEffect(() => {
+    const cachedData = dataCache[selectedWordle];
+    if (Date.now() < cachedData?.expiry) {
+      setError("");
+      setScoresData(cachedData.scores);
+      return;
+    } else {
+      delete dataCache[selectedWordle];
+    }
+
     const fetchData = async () => {
       const response = await fetch(
-        `http://localhost:3001/getStats/${selectedWordle}`,
-        // `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
+        // `http://localhost:3001/getStats/${selectedWordle}`,
+        `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
         {
           method: "GET",
         }
@@ -52,6 +61,11 @@ function App() {
       if (data.wordle) {
         setError("");
         setScoresData(data.scores);
+
+        dataCache[data.wordle] = {
+          scores: data.scores,
+          expiry: Date.now() + 1000 * 10,
+        };
       } else if (data.error) {
         setScoresData(null);
         setError(data.message || `oops, something's wrong`);
@@ -63,8 +77,8 @@ function App() {
 
   const addScore = (score) => {
     fetch(
-      `http://localhost:3001/addScore/${selectedWordle}/${score}`,
-      // `https://wordle-scores-project-service.herokuapp.com/addScore/${selectedWordle}/${score}`,
+      // `http://localhost:3001/addScore/${selectedWordle}/${score}`,
+      `https://wordle-scores-project-service.herokuapp.com/addScore/${selectedWordle}/${score}`,
       {
         method: "POST",
       }
