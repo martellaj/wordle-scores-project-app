@@ -15,18 +15,10 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const dataCache = {};
 
-// function randomIntFromInterval(min, max) {
-//   // min and max included
-//   return Math.floor(Math.random() * (max - min + 1) + min);
-// }
-
-// for (let i = 200; i < 300; i++) {
-//   localStorage.setItem("score-" + i, randomIntFromInterval(1, 6));
-// }
-
 function App() {
   const [selectedWordle, setSelectedWordle] = useState(getPuzzleNumber());
   const [scoresData, setScoresData] = useState({
+    0: 0,
     1: 0,
     2: 0,
     3: 0,
@@ -122,7 +114,7 @@ function App() {
               color="success"
               onClick={() => setIsAddScoreDialogOpen(true)}
             >
-              SUBMIT YOUR SCORE
+              SUBMIT TODAY'S SCORE
             </Button>
           </div>
         )}
@@ -144,7 +136,7 @@ function App() {
           {!error && scoresData && (
             <>
               <div className="title statsStats">
-                <span>Total submissions: {totalCount.toLocaleString()}</span>
+                <span>Total SUBMISSIONS: {totalCount.toLocaleString()}</span>
               </div>
 
               <GuessDistribution
@@ -208,7 +200,7 @@ function App() {
               <Chip label="4" onClick={() => addScore(4)} />
               <Chip label="5" onClick={() => addScore(5)} />
               <Chip label="6" onClick={() => addScore(6)} />
-              <Chip label="X" onClick={() => addScore(0)} />
+              <Chip label="X" onClick={() => addScore(0)} color="error" />
             </div>
           </DialogContent>
         </Dialog>
@@ -307,12 +299,22 @@ const Guess = (props) => {
       <div className="graph">
         <div
           className={`graph-bar align-right ${
-            // need to fix this so that it highlights per day
             userTodayScore === guess ? "highlight" : ""
           }`}
           style={{ width: `${(count / totalCount) * 100}%` }}
         >
           <div className="num-guesses">{count}</div>
+        </div>
+        <div
+          style={{
+            marginLeft: "12px",
+            color: "#b59f3b",
+            fontSize: "10px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {Math.floor((count / totalCount) * 100)}%
         </div>
       </div>
     </div>
