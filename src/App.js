@@ -246,6 +246,10 @@ const GuessDistribution = (props) => {
     totalCount += score;
   });
 
+  if (totalCount === 0) {
+    return null;
+  }
+
   return (
     <div style={{ width: "80%" }}>
       <Guess
