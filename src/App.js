@@ -27,7 +27,6 @@ function App() {
     6: 0,
   });
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
-  const [submittedScore, setSubmittedScore] = useState(getTodayGuess());
   const [error, setError] = useState("");
 
   const darkTheme = createTheme({
@@ -92,7 +91,6 @@ function App() {
       [score]: scoresData[score] + 1,
     });
 
-    setSubmittedScore(score);
     setIsAddScoreDialogOpen(false);
   };
 
@@ -176,6 +174,17 @@ function App() {
               <ArrowForwardIosIcon />
             </IconButton>
           </div>
+
+          <a
+            href="https://www.twitter.com/martellaj"
+            style={{
+              marginTop: "auto",
+              marginBottom: "60px",
+              color: "white",
+            }}
+          >
+            @martellaj
+          </a>
         </div>
 
         <Dialog
