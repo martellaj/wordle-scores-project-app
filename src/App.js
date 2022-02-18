@@ -9,6 +9,7 @@ import {
   IconButton,
   createTheme,
   ThemeProvider,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -28,6 +29,7 @@ function App() {
   });
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const darkTheme = createTheme({
     palette: {
@@ -40,6 +42,7 @@ function App() {
     const cachedData = dataCache[selectedWordle];
     if (Date.now() < cachedData?.expiry) {
       setError("");
+      setIsLoading(false);
       setScoresData(cachedData.scores);
       return;
     } else {
@@ -47,6 +50,8 @@ function App() {
     }
 
     const fetchData = async () => {
+      setIsLoading(true);
+
       const response = await fetch(
         // `http://localhost:3001/getStats/${selectedWordle}`,
         `https://wordle-scores-project-service.herokuapp.com/getStats/${selectedWordle}`,
@@ -61,6 +66,7 @@ function App() {
       if (data.wordle) {
         setError("");
         setScoresData(data.scores);
+        setIsLoading(false);
 
         dataCache[data.wordle] = {
           scores: data.scores,
@@ -69,6 +75,7 @@ function App() {
       } else if (data.error) {
         setScoresData(null);
         setError(data.message || `oops, something's wrong`);
+        setIsLoading(false);
       }
     };
 
@@ -116,6 +123,7 @@ function App() {
             </Button>
           </div>
         )}
+
         <div
           style={{
             display: "flex",
@@ -131,7 +139,19 @@ function App() {
           <span className="title" style={{ marginBottom: "0" }}>
             WORDLE {selectedWordle} SCORES
           </span>
-          {!error && scoresData && (
+          {isLoading && (
+            <div
+              style={{
+                height: "208px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          )}
+          {!error && scoresData && !isLoading && (
             <>
               <div className="title statsStats">
                 <span>Total SUBMISSIONS: {totalCount.toLocaleString()}</span>
@@ -149,7 +169,11 @@ function App() {
             </div>
           )}
           <div
-            style={{ display: "flex", alignItems: "center", marginTop: "12px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: "12px",
+            }}
           >
             <IconButton
               disabled={selectedWordle <= 235}
