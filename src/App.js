@@ -149,7 +149,9 @@ function App() {
               <span className="title">{error}</span>
             </div>
           )}
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", marginTop: "12px" }}
+          >
             <IconButton
               disabled={selectedWordle <= 235}
               onClick={() => {
@@ -197,6 +199,7 @@ function App() {
               <Chip label="4" onClick={() => addScore(4)} />
               <Chip label="5" onClick={() => addScore(5)} />
               <Chip label="6" onClick={() => addScore(6)} />
+              <Chip label="X" onClick={() => addScore(0)} />
             </div>
           </DialogContent>
         </Dialog>
@@ -272,6 +275,12 @@ const GuessDistribution = (props) => {
         totalCount={totalCount}
         userTodayScore={userTodayScore}
       />
+      <Guess
+        guess={0}
+        count={scores["0"]}
+        totalCount={totalCount}
+        userTodayScore={userTodayScore}
+      />
     </div>
   );
 };
@@ -281,7 +290,7 @@ const Guess = (props) => {
 
   return (
     <div className="graph-container">
-      <div className="guess">{guess}</div>
+      <div className="guess">{guess ? guess : "X"}</div>
       <div className="graph">
         <div
           className={`graph-bar align-right ${
